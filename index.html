@@ -11,7 +11,323 @@
             padding: 0;
             box-sizing: border-box;
         }
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login App</title>
+    <style>
+        /* Same styles as original */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .container {
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .login-form {
+            display: block;
+        }
+
+        .dashboard {
+            display: none;
+            text-align: center;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #555;
+            font-weight: 500;
+        }
+
+        input[type="text"],
+        input[type="password"] {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        input[type="text"]:focus,
+        input[type="password"]:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 0.75rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .error {
+            color: #e74c3c;
+            text-align: center;
+            margin-top: 1rem;
+            font-size: 0.9rem;
+        }
+
+        .role-display {
+            background: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+            border-left: 4px solid #667eea;
+        }
+
+        .admin-rights {
+            color: #27ae60;
+            font-weight: bold;
+        }
+
+        .no-admin-rights {
+            color: #e74c3c;
+            font-weight: bold;
+        }
+
+        .user-info {
+            background: #e3f2fd;
+            padding: 1rem;
+            border-radius: 5px;
+            margin-bottom: 1rem;
+        }
+
+        .logout-btn {
+            background: #e74c3c;
+            margin-top: 1rem;
+        }
+
+        .logout-btn:hover {
+            background: #c0392b;
+        }
+
+        .demo-credentials {
+            background: #fff3cd;
+            padding: 1rem;
+            border-radius: 5px;
+            margin-bottom: 1rem;
+            border-left: 4px solid #ffc107;
+        }
+
+        .demo-credentials h3 {
+            color: #856404;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .demo-credentials p {
+            color: #856404;
+            font-size: 0.8rem;
+            margin: 0.2rem 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Login Form - Changed IDs -->
+        <div id="loginFormContainer" class="login-form">
+            <h1>Login</h1>
+            
+            <div class="demo-credentials">
+                <h3>Demo Credentials:</h3>
+                <p><strong>Admin:</strong> admin / admin123</p>
+                <p><strong>User:</strong> user / user123</p>
+                <p><strong>Manager:</strong> manager / manager123</p>
+            </div>
+
+            <form id="loginFormElement" onsubmit="handleLogin(event)">
+                <div class="form-group">
+                    <label for="signInnameInput">Username:</label>
+                    <input type="text" id="signInnameInput" name="signInnameInput" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="passwordInput">Password:</label>
+                    <input type="password" id="passwordInput" name="password" required>
+                </div>
+                
+                <button type="submit" class="btn" id="loginSubmitBtn">Sign In</button>
+            </form>
+            
+            <div id="errorMessage" class="error"></div>
+        </div>
+
+        <!-- Dashboard - Changed IDs -->
+        <div id="dashboardContainer" class="dashboard">
+            <h1>Welcome to Dashboard</h1>
+            
+            <div class="user-info">
+                <p><strong>Logged in as:</strong> <span id="loggedInUser"></span></p>
+            </div>
+            
+            <div class="role-display">
+                <h2>Access Level:</h2>
+                <p id="userRoleMessage"></p>
+            </div>
+            
+            <button class="btn logout-btn" onclick="logout()" id="logoutButton">Sign Out</button>
+        </div>
+    </div>
+
+    <script>
+        // User database with roles
+        const users = {
+            'admin': {
+                password: 'admin123',
+                role: 'admin',
+                hasAdminRights: true
+            },
+            'user': {
+                password: 'user123',
+                role: 'user',
+                hasAdminRights: false
+            },
+            'manager': {
+                password: 'manager123',
+                role: 'manager',
+                hasAdminRights: true
+            },
+            'guest': {
+                password: 'guest123',
+                role: 'guest',
+                hasAdminRights: false
+            }
+        };
+
+        // Current logged-in user
+        let currentUser = null;
+
+        function handleLogin(event) {
+            event.preventDefault();
+            
+            const username = document.getElementById('signInnameInput').value.trim();
+            const password = document.getElementById('passwordInput').value;
+            const errorDiv = document.getElementById('errorMessage');
+            
+            // Clear previous error
+            errorDiv.textContent = '';
+            
+            // Validate credentials
+            if (users[username] && users[username].password === password) {
+                currentUser = {
+                    username: username,
+                    role: users[username].role,
+                    hasAdminRights: users[username].hasAdminRights
+                };
+                
+                showDashboard();
+            } else {
+                errorDiv.textContent = 'Invalid username or password';
+                
+                // Clear form
+                document.getElementById('signInnameInput').value = '';
+                document.getElementById('passwordInput').value = '';
+            }
+        }
+
+        function showDashboard() {
+            const loginForm = document.getElementById('loginFormContainer');
+            const dashboard = document.getElementById('dashboardContainer');
+            const currentUserSpan = document.getElementById('loggedInUser');
+            const roleMessage = document.getElementById('userRoleMessage');
+            
+            // Hide login form and show dashboard
+            loginForm.style.display = 'none';
+            dashboard.style.display = 'block';
+            
+            // Update user info
+            currentUserSpan.textContent = `${currentUser.username} (${currentUser.role})`;
+            
+            // Display role message
+            if (currentUser.hasAdminRights) {
+                roleMessage.innerHTML = '<span class="admin-rights">✓ You have admin rights</span>';
+                roleMessage.innerHTML += '<br><small>You can access all system features and manage users.</small>';
+            } else {
+                roleMessage.innerHTML = '<span class="no-admin-rights">✗ You don\'t have admin rights</span>';
+                roleMessage.innerHTML += '<br><small>You have limited access to system features.</small>';
+            }
+        }
+
+        function logout() {
+            currentUser = null;
+            
+            // Show login form and hide dashboard
+            document.getElementById('loginFormContainer').style.display = 'block';
+            document.getElementById('dashboardContainer').style.display = 'none';
+            
+            // Clear form
+            document.getElementById('signInnameInput').value = '';
+            document.getElementById('passwordInput').value = '';
+            document.getElementById('errorMessage').textContent = '';
+        }
+
+        // Handle Enter key in form fields
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('loginFormElement');
+            const inputs = form.querySelectorAll('input');
+            
+            inputs.forEach(input => {
+                input.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') {
+                        handleLogin(e);
+                    }
+                });
+            });
+        });
+
+        // Simple session management (optional)
+        window.addEventListener('beforeunload', function() {
+            // Clear session on page unload
+            currentUser = null;
+        });
+    </script>
+</body>
+</html>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
