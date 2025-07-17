@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login App</title>
     <style>
-        /* Same styles as original */
         * {
             margin: 0;
             padding: 0;
@@ -57,7 +56,8 @@
         }
 
         input[type="text"],
-        input[type="password"] {
+        input[type="password"],
+        input[type="email"] {
             width: 100%;
             padding: 0.75rem;
             border: 2px solid #ddd;
@@ -67,7 +67,8 @@
         }
 
         input[type="text"]:focus,
-        input[type="password"]:focus {
+        input[type="password"]:focus,
+        input[type="email"]:focus {
             outline: none;
             border-color: #667eea;
         }
@@ -94,6 +95,13 @@
 
         .error {
             color: #e74c3c;
+            text-align: center;
+            margin-top: 1rem;
+            font-size: 0.9rem;
+        }
+
+        .success {
+            color: #27ae60;
             text-align: center;
             margin-top: 1rem;
             font-size: 0.9rem;
@@ -152,91 +160,176 @@
             font-size: 0.8rem;
             margin: 0.2rem 0;
         }
+
+        /* Forgot Password Link */
+        .forgot-password {
+            text-align: center;
+            margin-top: 1rem;
+        }
+
+        .forgot-password a {
+            color: #667eea;
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: color 0.3s ease;
+        }
+
+        .forgot-password a:hover {
+            color: #764ba2;
+            text-decoration: underline;
+        }
+
+        /* Popup Overlay */
+        .popup-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .popup-overlay.active {
+            display: flex;
+        }
+
+        /* Popup Content */
+        .popup-content {
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+            width: 90%;
+            max-width: 400px;
+            position: relative;
+            animation: popupSlideIn 0.3s ease;
+        }
+
+        @keyframes popupSlideIn {
+            from {
+                transform: translateY(-50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        /* Close Button */
+        .close-btn {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #666;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: background-color 0.3s ease;
+        }
+
+        .close-btn:hover {
+            background-color: #f0f0f0;
+            color: #333;
+        }
+
+        .popup-content h2 {
+            color: #333;
+            margin-bottom: 1rem;
+            margin-right: 30px;
+        }
+
+        .popup-content p {
+            color: #666;
+            margin-bottom: 1.5rem;
+            line-height: 1.5;
+        }
     </style>
 </head>
 <body>
-    <div class="main-wrapper">
-        <div class="app-container">
-            <div class="container">
-                <!-- Login Form - Added wrapper elements -->
-                <div id="loginForm" class="login-form">
-                    <div class="header-section">
-                        <h1>Login</h1>
-                    </div>
-                    
-                    <div class="credentials-section">
-                        <div class="demo-credentials">
-                            <h3>Demo Credentials:</h3>
-                            <p><strong>Admin:</strong> admin / admin123</p>
-                            <p><strong>User:</strong> user / user123</p>
-                            <p><strong>Manager:</strong> manager / manager123</p>
-                        </div>
-                    </div>
-
-                    <div class="form-section">
-                        <form id="login" onsubmit="handleLogin(event)">
-                            <div class="input-section">
-                                <div class="form-group">
-                                    <div class="label-wrapper">
-                                        <label for="username">Username:</label>
-                                    </div>
-                                    <div class="input-wrapper">
-                                        <input type="text" id="username" name="username" required>
-                                    </div>
-                                </div>
-                                
-                                <div class="form-group">
-                                    <div class="label-wrapper">
-                                        <label for="password">Password:</label>
-                                    </div>
-                                    <div class="input-wrapper">
-                                        <input type="password" id="password" name="password" required>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <div class="button-section">
-                                <button type="submit" class="btn">Login</button>
-                            </div>
-                        </form>
-                    </div>
-                    
-                    <div class="error-section">
-                        <div id="error" class="error"></div>
-                    </div>
-                </div>
-
-                <!-- Dashboard - Added wrapper elements -->
-                <div id="dashboard" class="dashboard">
-                    <div class="dashboard-header">
-                        <h1>Welcome to Dashboard</h1>
-                    </div>
-                    
-                    <div class="dashboard-content">
-                        <div class="user-section">
-                            <div class="user-info">
-                                <p><strong>Logged in as:</strong> <span id="currentUser"></span></p>
-                            </div>
-                        </div>
-                        
-                        <div class="role-section">
-                            <div class="role-display">
-                                <h2>Access Level:</h2>
-                                <p id="roleMessage"></p>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="dashboard-footer">
-                        <button class="btn logout-btn" onclick="logout()">Logout</button>
-                    </div>
-                </div>
+    <div class="container">
+        <!-- Login Form -->
+        <div id="loginForm" class="login-form">
+            <h1>Login</h1>
+            
+            <div class="demo-credentials">
+                <h3>Demo Credentials:</h3>
+                <p><strong>Admin:</strong> admin / admin123</p>
+                <p><strong>User:</strong> user / user123</p>
+                <p><strong>Manager:</strong> manager / manager123</p>
             </div>
+
+            <form id="login" onsubmit="handleLogin(event)">
+                <div class="form-group">
+                    <label for="username">Username:</label>
+                    <input type="text" id="username" name="username" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="password">Password:</label>
+                    <input type="password" id="password" name="password" required>
+                </div>
+                
+                <button type="submit" class="btn">Login</button>
+            </form>
+            
+            <div class="forgot-password">
+                <a href="#" onclick="showForgotPasswordPopup()">Forgot Password?</a>
+            </div>
+            
+            <div id="error" class="error"></div>
+        </div>
+
+        <!-- Dashboard -->
+        <div id="dashboard" class="dashboard">
+            <h1>Welcome to Dashboard</h1>
+            
+            <div class="user-info">
+                <p><strong>Logged in as:</strong> <span id="currentUser"></span></p>
+            </div>
+            
+            <div class="role-display">
+                <h2>Access Level:</h2>
+                <p id="roleMessage"></p>
+            </div>
+            
+            <button class="btn logout-btn" onclick="logout()">Logout</button>
+        </div>
+    </div>
+
+    <!-- Forgot Password Popup -->
+    <div id="forgotPasswordPopup" class="popup-overlay">
+        <div class="popup-content">
+            <button class="close-btn" onclick="closeForgotPasswordPopup()">&times;</button>
+            <h2>Reset Password</h2>
+            <p>Enter your email address and we'll send you a link to reset your password.</p>
+            
+            <form id="forgotPasswordForm" onsubmit="handleForgotPassword(event)">
+                <div class="form-group">
+                    <label for="resetEmail">Email Address:</label>
+                    <input type="email" id="resetEmail" name="resetEmail" required>
+                </div>
+                
+                <button type="submit" class="btn">Send Reset Link</button>
+            </form>
+            
+            <div id="resetMessage" class="success"></div>
         </div>
     </div>
 
     <script>
-        // Same JavaScript as original
+        // User database with roles
         const users = {
             'admin': {
                 password: 'admin123',
@@ -260,6 +353,7 @@
             }
         };
 
+        // Current logged-in user
         let currentUser = null;
 
         function handleLogin(event) {
@@ -269,8 +363,10 @@
             const password = document.getElementById('password').value;
             const errorDiv = document.getElementById('error');
             
+            // Clear previous error
             errorDiv.textContent = '';
             
+            // Validate credentials
             if (users[username] && users[username].password === password) {
                 currentUser = {
                     username: username,
@@ -282,6 +378,7 @@
             } else {
                 errorDiv.textContent = 'Invalid username or password';
                 
+                // Clear form
                 document.getElementById('username').value = '';
                 document.getElementById('password').value = '';
             }
@@ -293,11 +390,14 @@
             const currentUserSpan = document.getElementById('currentUser');
             const roleMessage = document.getElementById('roleMessage');
             
+            // Hide login form and show dashboard
             loginForm.style.display = 'none';
             dashboard.style.display = 'block';
             
+            // Update user info
             currentUserSpan.textContent = `${currentUser.username} (${currentUser.role})`;
             
+            // Display role message
             if (currentUser.hasAdminRights) {
                 roleMessage.innerHTML = '<span class="admin-rights">✓ You have admin rights</span>';
                 roleMessage.innerHTML += '<br><small>You can access all system features and manage users.</small>';
@@ -310,14 +410,64 @@
         function logout() {
             currentUser = null;
             
+            // Show login form and hide dashboard
             document.getElementById('loginForm').style.display = 'block';
             document.getElementById('dashboard').style.display = 'none';
             
+            // Clear form
             document.getElementById('username').value = '';
             document.getElementById('password').value = '';
             document.getElementById('error').textContent = '';
         }
 
+        // Forgot Password Functions
+        function showForgotPasswordPopup() {
+            const popup = document.getElementById('forgotPasswordPopup');
+            popup.classList.add('active');
+            
+            // Clear previous messages
+            document.getElementById('resetMessage').textContent = '';
+            document.getElementById('resetEmail').value = '';
+        }
+
+        function closeForgotPasswordPopup() {
+            const popup = document.getElementById('forgotPasswordPopup');
+            popup.classList.remove('active');
+        }
+
+        function handleForgotPassword(event) {
+            event.preventDefault();
+            
+            const email = document.getElementById('resetEmail').value;
+            const messageDiv = document.getElementById('resetMessage');
+            
+            // Simulate sending reset email
+            messageDiv.textContent = `Reset link sent to ${email}`;
+            
+            // Clear form
+            document.getElementById('resetEmail').value = '';
+            
+            // Auto-close popup after 2 seconds
+            setTimeout(() => {
+                closeForgotPasswordPopup();
+            }, 2000);
+        }
+
+        // Close popup when clicking outside
+        document.getElementById('forgotPasswordPopup').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeForgotPasswordPopup();
+            }
+        });
+
+        // Close popup with Escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeForgotPasswordPopup();
+            }
+        });
+
+        // Handle Enter key in form fields
         document.addEventListener('DOMContentLoaded', function() {
             const form = document.getElementById('login');
             const inputs = form.querySelectorAll('input');
@@ -331,7 +481,9 @@
             });
         });
 
+        // Simple session management (optional)
         window.addEventListener('beforeunload', function() {
+            // Clear session on page unload
             currentUser = null;
         });
     </script>
