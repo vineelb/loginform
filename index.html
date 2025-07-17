@@ -155,54 +155,88 @@
     </style>
 </head>
 <body>
-    <div class="container">
-        <!-- Login Form - Changed IDs -->
-        <div id="loginFormContainer" class="login-form">
-            <h1>Login</h1>
-            
-            <div class="demo-credentials">
-                <h3>Demo Credentials:</h3>
-                <p><strong>Admin:</strong> admin / admin123</p>
-                <p><strong>User:</strong> user / user123</p>
-                <p><strong>Manager:</strong> manager / manager123</p>
-            </div>
+    <div class="main-wrapper">
+        <div class="app-container">
+            <div class="container">
+                <!-- Login Form - Added wrapper elements -->
+                <div id="loginForm" class="login-form">
+                    <div class="header-section">
+                        <h1>Login</h1>
+                    </div>
+                    
+                    <div class="credentials-section">
+                        <div class="demo-credentials">
+                            <h3>Demo Credentials:</h3>
+                            <p><strong>Admin:</strong> admin / admin123</p>
+                            <p><strong>User:</strong> user / user123</p>
+                            <p><strong>Manager:</strong> manager / manager123</p>
+                        </div>
+                    </div>
 
-            <form id="loginFormElement" onsubmit="handleLogin(event)">
-                <div class="form-group">
-                    <label for="signInnameInput">Username:</label>
-                    <input type="text" id="signInnameInput" name="signInnameInput" required>
+                    <div class="form-section">
+                        <form id="login" onsubmit="handleLogin(event)">
+                            <div class="input-section">
+                                <div class="form-group">
+                                    <div class="label-wrapper">
+                                        <label for="username">Username:</label>
+                                    </div>
+                                    <div class="input-wrapper">
+                                        <input type="text" id="username" name="username" required>
+                                    </div>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <div class="label-wrapper">
+                                        <label for="password">Password:</label>
+                                    </div>
+                                    <div class="input-wrapper">
+                                        <input type="password" id="password" name="password" required>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="button-section">
+                                <button type="submit" class="btn">Login</button>
+                            </div>
+                        </form>
+                    </div>
+                    
+                    <div class="error-section">
+                        <div id="error" class="error"></div>
+                    </div>
                 </div>
-                
-                <div class="form-group">
-                    <label for="passwordInput">Password:</label>
-                    <input type="password" id="passwordInput" name="password" required>
-                </div>
-                
-                <button type="submit" class="btn" id="loginSubmitBtn">Sign In</button>
-            </form>
-            
-            <div id="errorMessage" class="error"></div>
-        </div>
 
-        <!-- Dashboard - Changed IDs -->
-        <div id="dashboardContainer" class="dashboard">
-            <h1>Welcome to Dashboard</h1>
-            
-            <div class="user-info">
-                <p><strong>Logged in as:</strong> <span id="loggedInUser"></span></p>
+                <!-- Dashboard - Added wrapper elements -->
+                <div id="dashboard" class="dashboard">
+                    <div class="dashboard-header">
+                        <h1>Welcome to Dashboard</h1>
+                    </div>
+                    
+                    <div class="dashboard-content">
+                        <div class="user-section">
+                            <div class="user-info">
+                                <p><strong>Logged in as:</strong> <span id="currentUser"></span></p>
+                            </div>
+                        </div>
+                        
+                        <div class="role-section">
+                            <div class="role-display">
+                                <h2>Access Level:</h2>
+                                <p id="roleMessage"></p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="dashboard-footer">
+                        <button class="btn logout-btn" onclick="logout()">Logout</button>
+                    </div>
+                </div>
             </div>
-            
-            <div class="role-display">
-                <h2>Access Level:</h2>
-                <p id="userRoleMessage"></p>
-            </div>
-            
-            <button class="btn logout-btn" onclick="logout()" id="logoutButton">Sign Out</button>
         </div>
     </div>
 
     <script>
-        // User database with roles
+        // Same JavaScript as original
         const users = {
             'admin': {
                 password: 'admin123',
@@ -226,20 +260,17 @@
             }
         };
 
-        // Current logged-in user
         let currentUser = null;
 
         function handleLogin(event) {
             event.preventDefault();
             
-            const username = document.getElementById('signInnameInput').value.trim();
-            const password = document.getElementById('passwordInput').value;
-            const errorDiv = document.getElementById('errorMessage');
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value;
+            const errorDiv = document.getElementById('error');
             
-            // Clear previous error
             errorDiv.textContent = '';
             
-            // Validate credentials
             if (users[username] && users[username].password === password) {
                 currentUser = {
                     username: username,
@@ -251,26 +282,22 @@
             } else {
                 errorDiv.textContent = 'Invalid username or password';
                 
-                // Clear form
-                document.getElementById('signInnameInput').value = '';
-                document.getElementById('passwordInput').value = '';
+                document.getElementById('username').value = '';
+                document.getElementById('password').value = '';
             }
         }
 
         function showDashboard() {
-            const loginForm = document.getElementById('loginFormContainer');
-            const dashboard = document.getElementById('dashboardContainer');
-            const currentUserSpan = document.getElementById('loggedInUser');
-            const roleMessage = document.getElementById('userRoleMessage');
+            const loginForm = document.getElementById('loginForm');
+            const dashboard = document.getElementById('dashboard');
+            const currentUserSpan = document.getElementById('currentUser');
+            const roleMessage = document.getElementById('roleMessage');
             
-            // Hide login form and show dashboard
             loginForm.style.display = 'none';
             dashboard.style.display = 'block';
             
-            // Update user info
             currentUserSpan.textContent = `${currentUser.username} (${currentUser.role})`;
             
-            // Display role message
             if (currentUser.hasAdminRights) {
                 roleMessage.innerHTML = '<span class="admin-rights">✓ You have admin rights</span>';
                 roleMessage.innerHTML += '<br><small>You can access all system features and manage users.</small>';
@@ -283,19 +310,16 @@
         function logout() {
             currentUser = null;
             
-            // Show login form and hide dashboard
-            document.getElementById('loginFormContainer').style.display = 'block';
-            document.getElementById('dashboardContainer').style.display = 'none';
+            document.getElementById('loginForm').style.display = 'block';
+            document.getElementById('dashboard').style.display = 'none';
             
-            // Clear form
-            document.getElementById('signInnameInput').value = '';
-            document.getElementById('passwordInput').value = '';
-            document.getElementById('errorMessage').textContent = '';
+            document.getElementById('username').value = '';
+            document.getElementById('password').value = '';
+            document.getElementById('error').textContent = '';
         }
 
-        // Handle Enter key in form fields
         document.addEventListener('DOMContentLoaded', function() {
-            const form = document.getElementById('loginFormElement');
+            const form = document.getElementById('login');
             const inputs = form.querySelectorAll('input');
             
             inputs.forEach(input => {
@@ -307,9 +331,7 @@
             });
         });
 
-        // Simple session management (optional)
         window.addEventListener('beforeunload', function() {
-            // Clear session on page unload
             currentUser = null;
         });
     </script>
