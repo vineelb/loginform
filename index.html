@@ -179,6 +179,43 @@
             text-decoration: underline;
         }
 
+        /* Drag and Drop Button */
+        .drag-drop-section {
+            text-align: center;
+            margin-top: 1.5rem;
+            padding-top: 1rem;
+            border-top: 1px solid #eee;
+        }
+
+        .drag-drop-btn {
+            display: inline-block;
+            padding: 0.75rem 1.5rem;
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(40, 167, 69, 0.2);
+        }
+
+        .drag-drop-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(40, 167, 69, 0.3);
+            background: linear-gradient(135deg, #218838 0%, #1ea080 100%);
+        }
+
+        .drag-drop-btn:active {
+            transform: translateY(0);
+        }
+
+        .drag-drop-btn::before {
+            content: "🔄";
+            margin-right: 8px;
+            font-size: 1.1rem;
+        }
+
         /* Popup Overlay */
         .popup-overlay {
             position: fixed;
@@ -220,27 +257,25 @@
             }
         }
 
- .close-btn {
-    position: absolute;
-    top: 15px;
-    right: 15px;
-    background: transparent;
-    border: none;
-    font-size: 0;             /* Hide the × symbol */
-    cursor: pointer;
-    color: transparent;
-    width: 30px;
-    height: 30px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 50%;
-    opacity: 0;              /* Make button invisible */
-}
-
-.close-btn:hover {
-    background-color: transparent;
-}
+        /* Close Button */
+        .close-btn {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: transparent;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            opacity: 0;
+            transition: none;
+        }
 
         .popup-content h2 {
             color: #333;
@@ -285,6 +320,13 @@
             <div class="forgot-password">
                 <a href="#" onclick="showForgotPasswordPopup()">Forgot Password?</a>
             </div>
+
+            <!-- Drag and Drop Section -->
+            <div class="drag-drop-section">
+                <a href="drag_drop.html" target="_blank" class="drag-drop-btn">
+                    Try Drag & Drop Table
+                </a>
+            </div>
             
             <div id="error" class="error"></div>
         </div>
@@ -300,6 +342,13 @@
             <div class="role-display">
                 <h2>Access Level:</h2>
                 <p id="roleMessage"></p>
+            </div>
+
+            <!-- Drag and Drop Section in Dashboard -->
+            <div class="drag-drop-section">
+                <a href="drag_drop.html" target="_blank" class="drag-drop-btn">
+                    Open Drag & Drop Table
+                </a>
             </div>
             
             <button class="btn logout-btn" onclick="logout()">Logout</button>
